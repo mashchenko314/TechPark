@@ -16,7 +16,7 @@ import android.widget.Toast;
 
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity  {
     String text;
 
 
@@ -25,6 +25,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_fragments);
         FirstFragment firstFragment= new FirstFragment();
+        FragmentAdapter fragmentAdapter= data -> fromFragmentData(data);
+        firstFragment.setFragmentAdapter(fragmentAdapter);
         if (savedInstanceState==null){
         getSupportFragmentManager()
                 .beginTransaction()
@@ -35,7 +37,9 @@ public class MainActivity extends AppCompatActivity {
     }
     public void fromFragmentData(String data) {
         text = data;
-        SecondFragment fragment=new SecondFragment().newInstance(text);
+        SecondFragment fragment;
+        new SecondFragment();
+        fragment = SecondFragment.newInstance(text);
         String backStateName = fragment.getClass().getName();
         getSupportFragmentManager()
                 .beginTransaction()
@@ -44,6 +48,7 @@ public class MainActivity extends AppCompatActivity {
                 .commit();
 
     }
+
 
 
 }

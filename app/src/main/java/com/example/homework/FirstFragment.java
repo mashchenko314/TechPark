@@ -20,8 +20,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class FirstFragment extends Fragment {
 
+    private static FragmentAdapter mFragmentAdapter;
     private MyDataAdapter adapter;
-   String TransmittedText;
+   private String  TransmittedText;
 
     @Nullable
     @Override
@@ -29,7 +30,7 @@ public class FirstFragment extends Fragment {
                              @Nullable Bundle savedInstanceState){
         int numberOfColumns = 3;
         final View[] view = {inflater.inflate(R.layout.fragment_list,container,false)};
-        final RecyclerView recyclerView = (RecyclerView) view[0].findViewById(R.id.list);
+        final RecyclerView recyclerView =  view[0].findViewById(R.id.list);
         int horizontal=getResources().getBoolean(R.bool.is_horizontal)?
                 numberOfColumns=4:3;
 
@@ -42,9 +43,9 @@ public class FirstFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         AtomicInteger n;
-        Integer s;
+        int s;
         s=adapter.mData.size(); n=new AtomicInteger(s);
-        final Button button=(Button) view.findViewById(R.id.button);
+        final Button button= view.findViewById(R.id.button);
         button.setOnClickListener(v -> {
             n.getAndIncrement();
             MyDataSource.MyData m=new MyDataSource.MyData(n.toString());
@@ -52,12 +53,10 @@ public class FirstFragment extends Fragment {
             adapter.notifyDataSetChanged();
         });
     }
-    public void toActivity(String data) {
-        Activity activity = getActivity();
-        if (activity != null && !activity.isFinishing() && activity instanceof MainActivity) {
-            ((MainActivity) activity).fromFragmentData(data);
-        }
+    void setFragmentAdapter(FragmentAdapter fragmentAdapter) {
+        mFragmentAdapter = fragmentAdapter;
     }
+
     class MyDataAdapter extends RecyclerView.Adapter<FirstFragment.MyViewHolder>{
         List<MyDataSource.MyData> mData;
         MyDataAdapter (List<MyDataSource.MyData> data){
@@ -67,8 +66,7 @@ public class FirstFragment extends Fragment {
         @Override
         public FirstFragment.MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent,int viewType) {
             View view=LayoutInflater.from(parent.getContext()).inflate(R.layout.fragment_list_item,parent,false);
-           FirstFragment.MyViewHolder myViewHolder=new FirstFragment.MyViewHolder(view);
-            return myViewHolder;
+            return new MyViewHolder(view);
         }
 
         @Override
@@ -87,18 +85,20 @@ public class FirstFragment extends Fragment {
         public int getItemCount() {
             return mData.size();
         }
+
     }
     class MyViewHolder extends RecyclerView.ViewHolder{
         private final TextView textView;
 
-        public  MyViewHolder(@NonNull View itemView){
+        private  MyViewHolder(@NonNull View itemView){
             super(itemView);
             textView= itemView.findViewById(R.id.text);
             textView.setOnClickListener(v ->{
                int pos= getLayoutPosition();
                TransmittedText=adapter.mData.get(pos).mytext;
+               mFragmentAdapter.loadData(TransmittedText);
 
-               toActivity(TransmittedText);
+
 
 
             });
