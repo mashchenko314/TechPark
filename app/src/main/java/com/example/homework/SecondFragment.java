@@ -16,10 +16,10 @@ public class SecondFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
-                             @Nullable Bundle savedInstanceState){
-       View view= inflater.inflate(R.layout.fragment_text,container,false);
-       return view;
+                             @Nullable Bundle savedInstanceState) {
+        return inflater.inflate(R.layout.fragment_text, container, false);
     }
+
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -28,19 +28,21 @@ public class SecondFragment extends Fragment {
         if (arguments != null) {
             text = arguments.getString("SomeString");
         }
-        int i=Integer.parseInt(text);
-        if(i%2==0){
-            ((TextView)view.findViewById(R.id.text_item)).setTextColor(Color.BLUE);
-        ((TextView)view.findViewById(R.id.text_item)).setText(text);}
-        else{((TextView)view.findViewById(R.id.text_item)).setTextColor(Color.RED);
-            ((TextView)view.findViewById(R.id.text_item)).setText(text); }
-        Button button=(Button) view.findViewById(R.id.button2);
+        int i = Integer.parseInt(text);
+        if (i % 2 == 0) {
+            ((TextView) view.findViewById(R.id.text_item)).setTextColor(Color.BLUE);
+            ((TextView) view.findViewById(R.id.text_item)).setText(text);
+        } else {
+            ((TextView) view.findViewById(R.id.text_item)).setTextColor(Color.RED);
+            ((TextView) view.findViewById(R.id.text_item)).setText(text);
+        }
+        Button button = view.findViewById(R.id.button2);
         button.setOnClickListener(v -> {
-           getActivity().getSupportFragmentManager().popBackStack();
+            getActivity().getSupportFragmentManager().popBackStack();
         });
     }
 
-    public static SecondFragment newInstance( String someString) {
+    static SecondFragment newInstance(String someString) {
         SecondFragment fragment = new SecondFragment();
         Bundle args = new Bundle();
         args.putString("SomeString", someString);
