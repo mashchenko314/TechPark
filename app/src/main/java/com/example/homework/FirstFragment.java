@@ -14,8 +14,8 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class FirstFragment extends Fragment {
     interface OnItemSelected {
@@ -24,36 +24,49 @@ public class FirstFragment extends Fragment {
 
     private MyDataAdapter adapter;
     private String TransmittedText;
+    private List<String> myData;
 
     @Nullable
     @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        if (savedInstanceState != null)
+            myData = savedInstanceState.getStringArrayList("DATA");
+        else {
+            if (myData == null) {
+                myData = new ArrayList<>();
+                String text;
+                for (int i = 1; i < 101; i++) {
+                    text = Integer.toString(i);
+                    myData.add(text);
+                }
+            }
+        }
+    }
+
+    @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-
-        int numberOfColumns = 3;
         final View[] view = {inflater.inflate(R.layout.fragment_list, container, false)};
-        final RecyclerView recyclerView = view[0].findViewById(R.id.list);
-        if (getResources().getInteger(R.integer.column_amount) == 4)
-            numberOfColumns = 4;
-        GridLayoutManager layoutManager = new GridLayoutManager(getActivity(), numberOfColumns);
-        recyclerView.setLayoutManager(layoutManager);
-
-        adapter = new MyDataAdapter(MyDataSource.getInstance().getData());
-        recyclerView.setAdapter(adapter);
         return view[0];
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        AtomicInteger n;
-        int s;
-        s = adapter.getItemCount();
-        n = new AtomicInteger(s);
         final Button button = view.findViewById(R.id.button);
+
+        int numberOfColumns = 3;
+
+        final RecyclerView recyclerView = view.findViewById(R.id.list);
+        if (getResources().getInteger(R.integer.column_amount) == 4)
+            numberOfColumns = 4;
+        GridLayoutManager layoutManager = new GridLayoutManager(getActivity(), numberOfColumns);
+        recyclerView.setLayoutManager(layoutManager);
+
+        adapter = new MyDataAdapter(myData);
+        recyclerView.setAdapter(adapter);
         button.setOnClickListener(v -> {
-            n.getAndIncrement();
-            MyDataSource.MyData m = new MyDataSource.MyData(n.toString());
-            MyDataSource.mData.add(m);
+            adapter.addItem();
             adapter.notifyItemInserted(adapter.mData.size());
 
 
@@ -61,11 +74,17 @@ public class FirstFragment extends Fragment {
 
     }
 
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        super.onSaveInstanceState(savedInstanceState);
+        savedInstanceState.putStringArrayList("DATA", (ArrayList<String>) myData);
+    }
+
 
     class MyDataAdapter extends RecyclerView.Adapter<FirstFragment.MyViewHolder> {
-        List<MyDataSource.MyData> mData;
+        List<String> mData;
 
-        MyDataAdapter(List<MyDataSource.MyData> data) {
+        MyDataAdapter(List<String> data) {
             mData = data;
         }
 
@@ -81,10 +100,10 @@ public class FirstFragment extends Fragment {
             if ((position + 1) % 2 != 0) {
 
                 holder.textView.setTextColor(Color.RED);
-                holder.textView.setText(mData.get(position).mytext);
+                holder.textView.setText(mData.get(position));
             } else {
                 holder.textView.setTextColor(Color.BLUE);
-                holder.textView.setText(mData.get(position).mytext);
+                holder.textView.setText(mData.get(position));
             }
 
 
@@ -93,6 +112,11 @@ public class FirstFragment extends Fragment {
         @Override
         public int getItemCount() {
             return mData.size();
+        }
+
+        public void addItem() {
+            Integer n = myData.size() + 1;
+            myData.add(n.toString());
         }
 
     }
@@ -105,7 +129,7 @@ public class FirstFragment extends Fragment {
             textView = itemView.findViewById(R.id.text);
             textView.setOnClickListener(v -> {
                 int pos = getLayoutPosition();
-                TransmittedText = adapter.mData.get(pos).mytext;
+                TransmittedText = adapter.mData.get(pos);
                 ((OnItemSelected) getActivity()).loadData(TransmittedText);
 
 
